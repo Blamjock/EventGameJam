@@ -8,15 +8,21 @@ public class Food : MonoBehaviour {
 	public float delay = 5;
 
 	private float startExit;
+    private float startMovement;
+    private float movementTime;
     //public Vector3 startScale;
 	//public bool isShoot;
 
     //private Transform target;
 	private Rigidbody rb;
+    private float xMove;
+    private float yMove;
 
 	// Use this for initialization
 	void Start () {
 		startExit = 0;
+        startMovement = 0;
+        movementTime = Random.Range(1, 3);
 		rb = GetComponent<Rigidbody> ();
         //startScale = transform.localScale;
 		//isShoot = false;
@@ -38,6 +44,17 @@ public class Food : MonoBehaviour {
 			if(distance > transform.parent.GetComponent<SphereCollider>().radius)
 				transform.position = Vector3.MoveTowards(transform.position,transform.parent.position ,  speed);
 		}
+        else
+        {
+            if (((Time.time - startMovement) > movementTime) || (startMovement == 0))
+            {
+                xMove = Random.Range(-10, 10);
+                yMove = Random.Range(-16, 16);
+                startMovement = Time.time;
+                movementTime = Random.Range(3, 6);
+            }
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(xMove, yMove, transform.position.z), speed);
+        }
 	}
 
 	void OnTriggerEnter(Collider col)
