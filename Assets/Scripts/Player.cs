@@ -10,8 +10,11 @@ public class Player : MonoBehaviour {
 	//public int maxSizeChange;
 	//public float shootForce = 100;
 	public int countParticles;
+    public int time2Death = 3;
 
     private Rigidbody rb;
+    private float startCountdown;
+    private bool isDying = false;
     //private Vector3 startposition;
     //private Quaternion startrotation;
     //private Vector3 startscale;
@@ -20,7 +23,7 @@ public class Player : MonoBehaviour {
     // Use this for initialization
     void Start () {
 		rb = GetComponent<Rigidbody> ();
-        countParticles = 0;
+        countParticles = 1;
         //startposition = transform.position;
         //startrotation = transform.rotation;
         //startscale = transform.localScale;
@@ -28,6 +31,14 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        if(isDying)
+        {
+            Debug.Log((time2Death - (int)(Time.time - startCountdown)));
+        }
+        if(isDying && ((Time.time - startCountdown) > time2Death))
+        {
+            Destroy(this.gameObject);
+        }
 	}
 
 	public void moveHorizontal(float direction)
@@ -60,8 +71,31 @@ public class Player : MonoBehaviour {
 		if (col.gameObject.tag.Equals ("Food") && (col.gameObject.transform.parent == null) && (countParticles < 4)) {
 			col.gameObject.SendMessage ("setParent", this.gameObject.transform);
 			//myfood = col.gameObject;
-			countParticles ++;
 		}
+    }
+
+    public void addParticle()
+    {
+        if(countParticles == 0)
+            isDying = false;
+        countParticles++;
+        if (countParticles == 4)
+        {
+            isDying = true;
+            startCountdown = Time.time;
+        }
+    }
+
+    public void removeParticle()
+    {
+        if (countParticles == 4)
+            isDying = false;
+        countParticles--;
+        if (countParticles == 0)
+        {
+            isDying = true;
+            startCountdown = Time.time;
+        }
     }
 
 	void OnTriggerExit(Collider col)

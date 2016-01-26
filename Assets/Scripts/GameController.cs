@@ -13,6 +13,12 @@ public class GameController : MonoBehaviour {
 
 	public Player player1;
 	public Player player2;
+    public GameObject spawnArea;
+    public GameObject protonPrefab;
+    public GameObject electronPrefab;
+    public int maxFood;
+    
+    private int foodCount;
 	//private myColors mycolor;
 
 	void Awake()
@@ -51,5 +57,21 @@ public class GameController : MonoBehaviour {
         if (!player2.gameObject.activeSelf)
             if ((Time.time - player2.startDisable) > player2.disableTime)
                 player2.restart();*/
+
+        if(foodCount < maxFood)
+        {
+            Vector3 randomPosition;
+            randomPosition.x = spawnArea.transform.position.x + Random.Range(-spawnArea.GetComponent<MeshRenderer>().bounds.extents.x, spawnArea.GetComponent<MeshRenderer>().bounds.extents.x);
+            randomPosition.y = spawnArea.transform.position.y + Random.Range(-spawnArea.GetComponent<MeshRenderer>().bounds.extents.y, spawnArea.GetComponent<MeshRenderer>().bounds.extents.y);
+            GameObject myprefab = (Random.Range(0, 2) == 0) ? protonPrefab : electronPrefab;
+            randomPosition.z = myprefab.transform.position.z;
+            GameObject enemy = Instantiate(myprefab, randomPosition, myprefab.transform.rotation) as GameObject;
+            foodCount++;
+        }
+    }
+
+    public void removeFood()
+    {
+        foodCount--;
     }
 }
