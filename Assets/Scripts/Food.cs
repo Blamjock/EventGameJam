@@ -4,39 +4,85 @@ using System.Collections;
 public class Food : MonoBehaviour {
 	public float rotationSpeed;
 	public float speed;
+	public int electricCharge;
+	public float delay = 5;
 
-	private Transform target;
+	private float startExit;
+    //public Vector3 startScale;
+	//public bool isShoot;
+
+    //private Transform target;
 	private Rigidbody rb;
+
 	// Use this for initialization
 	void Start () {
+		startExit = 0;
 		rb = GetComponent<Rigidbody> ();
+        //startScale = transform.localScale;
+		//isShoot = false;
 	}
-	
+
+	//
+	//transform.Translate(-col.transform.position*0.5f);
+	//
+
 	// Update is called once per frame
 	void Update () {
-		if (target != null) {
-			transform.LookAt (target.position, transform.up);
-			transform.RotateAround (target.position, transform.right, Time.deltaTime*rotationSpeed);	
-			rb.MovePosition(transform.position + transform.forward * speed);
+		if (transform.parent != null) {
+//			transform.LookAt (transform.parent.position, transform.up);
+			transform.RotateAround (transform.parent.position, transform.forward, rotationSpeed);	
+			//rb.MovePosition(transform.position + transform.forward * speed);
+			float distance = Vector3.Distance(transform.position, transform.parent.position);
+			if(distance < transform.parent.GetComponent<SphereCollider>().radius)
+				transform.position = Vector3.MoveTowards(transform.position,transform.parent.position , - speed);
+			if(distance > transform.parent.GetComponent<SphereCollider>().radius)
+				transform.position = Vector3.MoveTowards(transform.position,transform.parent.position ,  speed);
 		}
 	}
 
-	void setTarget( Transform newtarget)
+	void OnTriggerEnter(Collider col)
 	{
-		target = newtarget;
-		transform.SetParent (target);
+		Debug.Log ("collisione");
+		if(col.gameObject.tag.Equals("Food"))
+		   {
+			if(((col.gameObject.GetComponent<Food>().electricCharge * electricCharge) < 0) && electricCharge > 0)
+			{
+				transform.parent.GetComponent<Player>().countParticles--;
+				if(col.gameObject.transform.parent.GetComponent<Player>().countParticles < 4)
+				{
+					transform.parent = col.gameObject.transform.parent;
+					transform.Translate(-col.gameObject.transform.position*0.5f);
+					col.gameObject.transform.parent.GetComponent<Player>().countParticles++;
+				}
+			}
+			else if((col.gameObject.GetComponent<Food>().electricCharge * electricCharge) > 0)
+			{
+				transform.Translate(-col.transform.position*4f);
+				transform.parent = null;
+				startExit = Time.time;
+				col.gameObject.transform.Translate(-col.transform.position*4f);
+				col.gameObject.transform.parent = null;
+				col.gameObject.GetComponent<Food>().startExit = Time.time;
+			}
+		}
 	}
 
-	void unsetTarget()
+	public void setParent( Transform newparent)
+	{
+		if(((Time.time - startExit) > delay) || (startExit==0))
+        	transform.SetParent(newparent);
+	}
+
+	/*public void Shoot(float shoot)
 	{
 		target = null;
 		transform.SetParent (null);
-	}
+        rb.AddForce(transform.forward * -shoot);
+        transform.localScale = startScale;
+	}*/
 
-	void OnCollisionEnter(Collision col)
+	/*public void setIsShoot()
 	{
-		Debug.Log ("Colliso");
-		if (col.gameObject.tag.Equals ("Player"))
-			Destroy (this.gameObject);
-	}
+		isShoot = true;
+	}*/
 }

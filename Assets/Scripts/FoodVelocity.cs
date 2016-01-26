@@ -12,4 +12,13 @@ public class FoodVelocity : MonoBehaviour {
 	void Update () {
 	
 	}
+
+    /*void OnCollisionEnter(Collision col)
+	{
+        if (col.gameObject.tag.Equals("Player"))
+        {
+            col.gameObject.SendMessage("addSpeed", speedAdder);
+            Destroy(this.gameObject);
+        }
+    }*/
 }

@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class ColorChanger : MonoBehaviour {
-	public Material materialBlue;
+	/*public Material materialBlue;
 	public Material materialGreen;
 	public myColors mycolor;
 	// Use this for initialization
@@ -33,5 +33,5 @@ public class ColorChanger : MonoBehaviour {
 			this.gameObject.GetComponent<Renderer> ().material = materialGreen;
 			break;
 		}
-	}
+	}*/
 }
