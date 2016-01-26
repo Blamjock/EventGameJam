@@ -42,22 +42,23 @@ public class Food : MonoBehaviour {
 
 	void OnTriggerEnter(Collider col)
 	{
-		Debug.Log ("collisione");
 		if(col.gameObject.tag.Equals("Food"))
 		   {
-			if(((col.gameObject.GetComponent<Food>().electricCharge * electricCharge) < 0) && electricCharge > 0)
+			if(((col.gameObject.GetComponent<Food>().electricCharge * electricCharge) < 0) && (electricCharge > 0) && (transform.parent != col.gameObject.transform.parent) && (transform.parent!= null))
 			{
-				transform.parent.GetComponent<Player>().countParticles--;
-				if(col.gameObject.transform.parent.GetComponent<Player>().countParticles < 4)
+                transform.parent.SendMessage("removeParticle");
+                if (col.gameObject.transform.parent.GetComponent<Player>().countParticles < 4)
 				{
 					transform.parent = col.gameObject.transform.parent;
 					transform.Translate(-col.gameObject.transform.position*0.5f);
-					col.gameObject.transform.parent.GetComponent<Player>().countParticles++;
+					col.gameObject.transform.parent.SendMessage("addParticle");
 				}
 			}
-			else if((col.gameObject.GetComponent<Food>().electricCharge * electricCharge) > 0)
+			else if(((col.gameObject.GetComponent<Food>().electricCharge * electricCharge) > 0) && (transform.parent != col.gameObject.transform.parent) && (transform.parent != null))
 			{
-				transform.Translate(-col.transform.position*4f);
+                transform.parent.SendMessage("removeParticle");
+                col.gameObject.transform.parent.SendMessage("removeParticle"); ;
+                transform.Translate(-col.transform.position*4f);
 				transform.parent = null;
 				startExit = Time.time;
 				col.gameObject.transform.Translate(-col.transform.position*4f);
@@ -69,9 +70,17 @@ public class Food : MonoBehaviour {
 
 	public void setParent( Transform newparent)
 	{
-		if(((Time.time - startExit) > delay) || (startExit==0))
-        	transform.SetParent(newparent);
+        if (((Time.time - startExit) > delay) || (startExit == 0))
+        {
+            transform.SetParent(newparent);
+            transform.parent.SendMessage("addParticle");
+        }
 	}
+
+    void OnDestroy()
+    {
+        GameController.instance.removeFood();
+    }
 
 	/*public void Shoot(float shoot)
 	{
